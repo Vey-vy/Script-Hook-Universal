@@ -11,17 +11,37 @@ on:
 
 jobs:
   build:
-    name: ${{ matrix.preset }}
+    name: ${{ matrix.game }}-${{ matrix.config }}
     runs-on: windows-latest
     
     strategy:
       fail-fast: false
       matrix:
-        preset:
-          - x64-debug
-          - x64-release
-          - x32-debug
-          - x32-release
+        include:
+          - game: GTAV
+            arch: x64
+            config: Debug
+          - game: GTAV
+            arch: x64
+            config: Release
+          - game: RDR2
+            arch: x64
+            config: Debug
+          - game: RDR2
+            arch: x64
+            config: Release
+          - game: RDR
+            arch: x64
+            config: Debug
+          - game: RDR
+            arch: x64
+            config: Release
+          - game: MP3
+            arch: x32
+            config: Debug
+          - game: MP3
+            arch: x32
+            config: Release
     
     steps:
     - name: Checkout
@@ -30,24 +50,42 @@ jobs:
     - name: Setup MSVC
       uses: ilammy/msvc-dev-cmd@v1
       with:
-        arch: ${{ contains(matrix.preset, 'x64') && 'x64' || 'x86' }}
+        arch: ${{ matrix.arch == 'x64' && 'x64' || 'x86' }}
     
     - name: Setup Ninja
       uses: seanmiddleditch/gha-setup-ninja@v4
     
     - name: Configure CMake
-      run: cmake --preset ${{ matrix.preset }}
+      run: |
+        cmake -B build -G Ninja `
+          -DCMAKE_BUILD_TYPE=${{ matrix.config }} `
+          -DTARGET_GAME=${{ matrix.game }} `
+          -DCMAKE_C_COMPILER=cl.exe `
+          -DCMAKE_CXX_COMPILER=cl.exe
     
     - name: Build
-      run: cmake --build --preset ${{ matrix.preset }}
+      run: cmake --build build --config ${{ matrix.config }}
+    
+    - name: Rename DLL
+      run: |
+        $gameName = "${{ matrix.game }}"
+        $buildType = "${{ matrix.config }}"
+        $newName = "ScriptHook${gameName}-${buildType}.dll"
+        
+        $dllPath = "build/ScriptHook.dll"
+        
+        if (Test-Path $dllPath) {
+          New-Item -ItemType Directory -Force -Path output
+          Copy-Item $dllPath "output/$newName"
+          Write-Host "Created: $newName"
+        }
+      shell: pwsh
     
     - name: Upload Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: ScriptHook-${{ matrix.preset }}
-        path: |
-          out/build/${{ matrix.preset }}/*.dll
-          out/build/${{ matrix.preset }}/*.pdb
+        name: ScriptHook-${{ matrix.game }}-${{ matrix.config }}
+        path: output/*.dll
         if-no-files-found: error
 
   release:
@@ -64,20 +102,23 @@ jobs:
       with:
         path: artifacts
     
-    - name: Rename DLLs
+    - name: Organize Release Files
       run: |
-        Get-ChildItem -Path artifacts -Filter *.dll -Recurse | ForEach-Object {
-          $preset = $_.Directory.Parent.Name
-          $newName = "ScriptHook-$preset.dll"
-          Copy-Item $_.FullName -Destination "artifacts/$newName"
+        New-Item -ItemType Directory -Force -Path release
+        
+        Get-ChildItem -Path artifacts -Filter "*.dll" -Recurse | ForEach-Object {
+          Copy-Item $_.FullName -Destination "release/$($_.Name)"
+          Write-Host "Added: $($_.Name)"
         }
+        
+        Write-Host "`nFinal release files:"
+        Get-ChildItem -Path release | Format-Table Name
       shell: pwsh
     
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files: |
-          artifacts/ScriptHook-*.dll
+        files: release/*.dll
         draft: false
         prerelease: false
         generate_release_notes: true
