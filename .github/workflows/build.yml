@@ -2,9 +2,11 @@ name: Build
 
 on:
   push:
-    branches: [ main, dev ]
+    branches: [ master, main, dev ]
+    tags:
+      - 'v*'
   pull_request:
-    branches: [ main ]
+    branches: [ master, main ]
   workflow_dispatch:
 
 jobs:
@@ -52,7 +54,9 @@ jobs:
     name: Create Release
     runs-on: windows-latest
     needs: build
-    if: startsWith(github.ref, 'refs/tags/')
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
     
     steps:
     - name: Download all artifacts
@@ -60,11 +64,14 @@ jobs:
       with:
         path: artifacts
     
+    - name: Display structure
+      run: ls -R artifacts
+      shell: bash
+    
     - name: Create Release
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v2
       with:
         files: artifacts/**/*.dll
         draft: false
         prerelease: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        generate_release_notes: true
