@@ -64,14 +64,20 @@ jobs:
       with:
         path: artifacts
     
-    - name: Display structure
-      run: ls -R artifacts
-      shell: bash
+    - name: Rename DLLs
+      run: |
+        Get-ChildItem -Path artifacts -Filter *.dll -Recurse | ForEach-Object {
+          $preset = $_.Directory.Parent.Name
+          $newName = "ScriptHook-$preset.dll"
+          Copy-Item $_.FullName -Destination "artifacts/$newName"
+        }
+      shell: pwsh
     
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files: artifacts/**/*.dll
+        files: |
+          artifacts/ScriptHook-*.dll
         draft: false
         prerelease: false
         generate_release_notes: true
