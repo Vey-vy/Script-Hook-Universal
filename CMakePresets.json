@@ -4,26 +4,44 @@
     {
       "name": "x64-debug",
       "displayName": "x64 Debug",
-      "description": "Ciblez Windows (64 bits) avec l'environnement de développement Visual Studio. (Debug)",
+      "description": "Target Windows (64-bit) with Visual Studio development environment. (Debug)",
       "configurePreset": "x64-debug"
     },
     {
       "name": "x64-release-debug",
       "displayName": "x64 Release Debug",
-      "description": "Ciblez Windows (64 bits) avec l'environnement de développement Visual Studio. (RelWithDebInfo)",
+      "description": "Target Windows (64-bit) with Visual Studio development environment. (RelWithDebInfo)",
       "configurePreset": "x64-release-debug"
     },
     {
       "name": "x64-release",
       "displayName": "x64 Release",
-      "description": "Ciblez Windows (64 bits) avec l'environnement de développement Visual Studio. (RelWithDebInfo)",
+      "description": "Target Windows (64-bit) with Visual Studio development environment. (Release)",
       "configurePreset": "x64-release"
+    },
+    {
+      "name": "x32-debug",
+      "displayName": "x32 Debug",
+      "description": "Target Windows (32-bit) with Visual Studio development environment. (Debug)",
+      "configurePreset": "x32-debug"
+    },
+    {
+      "name": "x32-release-debug",
+      "displayName": "x32 Release Debug",
+      "description": "Target Windows (32-bit) with Visual Studio development environment. (RelWithDebInfo)",
+      "configurePreset": "x32-release-debug"
+    },
+    {
+      "name": "x32-release",
+      "displayName": "x32 Release",
+      "description": "Target Windows (32-bit) with Visual Studio development environment. (Release)",
+      "configurePreset": "x32-release"
     }
   ],
   "configurePresets": [
     {
       "name": "windows-base",
-      "description": "Ciblez Windows avec l'environnement de développement Visual Studio.",
+      "description": "Target Windows with Visual Studio development environment.",
       "hidden": true,
       "generator": "Ninja",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
@@ -42,7 +60,7 @@
     {
       "name": "x64-debug",
       "displayName": "x64 Debug",
-      "description": "Ciblez Windows (64 bits) avec l'environnement de développement Visual Studio. (Debug)",
+      "description": "Target Windows (64-bit) with Visual Studio development environment. (Debug)",
       "inherits": "windows-base",
       "binaryDir": "${sourceDir}/out/build/${presetName}",
       "installDir": "${sourceDir}/out/install/${presetName}",
@@ -58,10 +76,10 @@
     {
       "name": "x64-release-debug",
       "displayName": "x64 Release Debug",
-      "description": "Ciblez Windows (64 bits) avec l'environnement de développement Visual Studio. (RelWithDebInfo)",
+      "description": "Target Windows (64-bit) with Visual Studio development environment. (RelWithDebInfo)",
       "inherits": "x64-debug",
-      "binaryDir": "${sourceDir}/out/build/ReleaseDev",
-      "installDir": "${sourceDir}/out/install/ReleaseDev",
+      "binaryDir": "${sourceDir}/out/build/x64-ReleaseDev",
+      "installDir": "${sourceDir}/out/install/x64-ReleaseDev",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "RelWithDebInfo",
         "DEV_BUILD": "ON",
@@ -71,12 +89,57 @@
     {
       "name": "x64-release",
       "displayName": "x64 Release",
-      "description": "Ciblez Windows (64 bits) avec l'environnement de développement Visual Studio.",
+      "description": "Target Windows (64-bit) with Visual Studio development environment. (Release)",
       "inherits": "windows-base",
-      "binaryDir": "${sourceDir}/out/build/Release",
-      "installDir": "${sourceDir}/out/install/Release",
+      "binaryDir": "${sourceDir}/out/build/x64-Release",
+      "installDir": "${sourceDir}/out/install/x64-Release",
       "architecture": {
         "value": "x64",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "x32-debug",
+      "displayName": "x32 Debug",
+      "description": "Target Windows (32-bit) with Visual Studio development environment. (Debug)",
+      "inherits": "windows-base",
+      "binaryDir": "${sourceDir}/out/build/${presetName}",
+      "installDir": "${sourceDir}/out/install/${presetName}",
+      "architecture": {
+        "value": "x86",
+        "strategy": "external"
+      },
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "x32-release-debug",
+      "displayName": "x32 Release Debug",
+      "description": "Target Windows (32-bit) with Visual Studio development environment. (RelWithDebInfo)",
+      "inherits": "x32-debug",
+      "binaryDir": "${sourceDir}/out/build/x32-ReleaseDev",
+      "installDir": "${sourceDir}/out/install/x32-ReleaseDev",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "DEV_BUILD": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      }
+    },
+    {
+      "name": "x32-release",
+      "displayName": "x32 Release",
+      "description": "Target Windows (32-bit) with Visual Studio development environment. (Release)",
+      "inherits": "windows-base",
+      "binaryDir": "${sourceDir}/out/build/x32-Release",
+      "installDir": "${sourceDir}/out/install/x32-Release",
+      "architecture": {
+        "value": "x86",
         "strategy": "external"
       },
       "cacheVariables": {
