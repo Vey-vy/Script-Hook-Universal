@@ -49,9 +49,6 @@ world_get_all_vehicles             // Get all vehicle handles
 world_get_all_peds                 // Get all ped handles
 world_get_all_objects              // Get all object handles
 world_get_all_pickups              // Get all pickup handles
-
-// RedHook Functions
-
 ```
 
 ## Red Dead Redemption
